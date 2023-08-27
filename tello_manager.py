@@ -18,11 +18,12 @@ class TelloSocket:
   MY_IP_ADDRESS = 'localhost'
   MY_PORT = 9000
   
-  def __init__(self, port, mode='testmode'):
+  def __init__(self, port, *mode):
     self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     self.tello_address = (self.TELLO_IP_ADDRESS, port)
     self.my_address = (self.MY_IP_ADDRESS, self.MY_PORT)
-    if mode == 'testmode':
+    if 'testmode' in mode:
+      print(mode[0])
       self.tello_address = (self.TEST_IP_ADDRESS, 9999)
       self.my_address = (self.TEST_IP_ADDRESS, 9998)
     
