@@ -6,8 +6,8 @@ import threading
 import PySimpleGUI as sg
 
 class TelloController:
-  def __init__(self):
-    self.tello = tello_manager.TelloSocket(8889, 'testmode')
+  def __init__(self, mode):
+    self.tello = tello_manager.TelloSocket(8889, mode)
     # Tello SDK mode
     self.tello.socket_send('command')
     self.window = None
@@ -88,6 +88,10 @@ class TelloController:
           self.event_left()
         if event == '-RIGHT-':
           self.event_right()
+        if event == '-LEFTROLL-':
+          self.event_leftroll()
+        if event == '-RIGHTROLL-':
+          self.event_rightroll()
 
     self.window.close()
   
@@ -122,11 +126,6 @@ class TelloController:
   def event_rightroll(self):
     print('RIGHTROLL')
     self.tello.socket_send('cw 20')
-
-def create_window():
-  controller = TelloController()
-  controller.create_window()
-  controller.run()
 
 if __name__ == "__main__":
   pass
