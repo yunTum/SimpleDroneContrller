@@ -13,22 +13,29 @@ class TelloSocket:
   STATE_STR_CONNECTED = 'connected'
   STATE_STR_CONNECTING = 'connecting'
   STATE_STR_QUIT = 'quit'
+  TELLO_IP_ADDRESS = '192.168.10.1'
+  #TEST_IP_ADDRESS = 'localhost'
+  MY_IP_ADDRESS = 'localhost'
+  MY_PORT = 9998
   
   def __init__(self, port):
     self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
-    self.address = ('192.168.10.1', port)
-    self.socket.bind(('', port))
+    self.tello_address = (self.TELLO_IP_ADDRESS, port)
+    self.my_address = (self.MY_IP_ADDRESS, self.MY_PORT)
+    
+    self.socket.bind(self.my_address)
     self.socket.settimeout(2)
     self.udp_bufsize = 1024
     self.state = self.STATE_STR_CONNECTED
     
-    threading.Thread(target=self.recv_data).start()
-  
+    self.thead = threading.Thread(target=self.recv_data)
+    self.thead.start()
+
   def __del__(self):
     print('TelloSocket is deleted')
     
   def socket_send(self, command):
-      self.socket.sendto(command.encode('utf-8'), self.address)
+      self.socket.sendto(command.encode('utf-8'), self.tello_address)
       
   def socket_receive(self):
       try:
@@ -42,20 +49,23 @@ class TelloSocket:
   def recv_data(self):
     while self.state != self.STATE_STR_QUIT:
       try:
-          data, server = self.socket.recvfrom(self.udp_bufsize)
-          print("recv: %s", data)
-      except self.socket.timeout as ex:
-          if self.state == self.STATE_STR_CONNECTED:
-              print('recv: timeout')
+          response, ip_address = self.socket.recvfrom(self.udp_bufsize)
+          response = response.decode('utf-8')
+          print("recv: {0}".format(response) )
       except Exception as ex:
-          print('recv: %s', str(ex))
+          print('recv: {0}'.format(str(ex)) )
     print('exit from the recv thread.')
   
   def socket_close(self):
-    self.socket.close()
+    self.state = self.STATE_STR_QUIT
+    self.socket.sendto('quit'.encode('utf-8'), self.tello_address)
+    self.thead.join()
+    #self.socket.close()
 
 def drone_test():
-  tello = TelloSocket(8889)
+  test_port = 9999
+  tello_port = 8889
+  tello = TelloSocket(tello_port)
   tello.socket_send('takeoff')
   time.sleep(5)
   tello.socket_send('land')
@@ -64,3 +74,6 @@ def drone_test():
 
 def main():
   drone_test()
+
+if __name__ == "__main__":
+  main()
