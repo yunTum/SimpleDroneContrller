@@ -1,0 +1,33 @@
+# https://algorithm.joho.info/programming/python/tello-python-command/
+
+Command	= 'command'                 #SDKモードを開始(コマンドでTelloを遠隔操作する際に最初に必ず実行)
+streamon = 'streamon' 	            #ビデオストリームを有効化(カメラ映像を送信する)	
+streamoff = 'streamoff'	            #ビデオストリームを無効化(カメラ映像を送信しない)
+emergency = 'emergency'             #緊急停止(すぐにモーターを停止させる)
+wifi_ssid_pass = 'wifi ssid pass'   #Wi-FiのSSIDとパスワードを設定(Telloアプリからでも設定可能)	ssid:SSID、pass:パスワード
+ap_ssid_pass = 'ap ssid pass'       #Telloをステーションモードに設定し、アクセスポイントのSSIDとパスワードを使用して新しいアクセスポイントに接続	ssid:SSID、pass:パスワード
+takeoff	= 'takeoff'                 #離陸
+land='land'                         #着陸
+stop='stop'	                        #空中で停止(ホバリング)	ー
+speed='speed'	                    #速度をx[cm/s]に設定	10〜100
+left='left'                         #左にx[cm]移動	20~500
+right='right'                       #右にx[cm]移動	20~500
+forward='forward'                   #前にx[cm]移動	20~500
+back='back'                         #後ろにx[cm]移動	20~500
+up='up'                             #x[cm]上昇	20~500
+down='down'                         #x[cm]下降	20~500
+cw='cw'                             #右回りにx[度]回転	1〜360
+ccw='ccw'	                        #左回りにx[度]回転	1〜360
+flip='flip'                         #x方向に反転	　”l”:左、”r”:右、”f”:前、”b”:後ろ
+query_speed='speed?'                #現在の速度[cm/s]を取得	0〜100
+query_battery='battery?'            #現在のバッテリー残量[%]を取得	0〜100
+query_time='time?'                  #現在の飛行時間[秒]を取得
+query_wifi='wifi?'                  #現在のWi-FiのS/N比（信号雑音比）を取得
+query_sdk='sdk?'                    #Tello SDKのバージョンを取得
+query_sn='sn?'                      #Telloのシリアルナンバーを取得
+query_height='height?'              #現在の高さ(cm)を取得	0-3000
+query_temp='temp?'                  #現在の温度(℃)を取得	0-90
+query_attitude='attitude?'          #IMU(慣性計測装置) の姿勢情報を取得
+query_baro='baro?'                  #バロメータ（気圧計）の値(m)を取得
+qury_acceleration='acceleration?'	#IMU角加速度データを取得
+query_tof='tof?'                    #TOFからの距離(cm)を取得	30-1000
