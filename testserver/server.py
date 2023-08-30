@@ -1,4 +1,7 @@
 import socket
+import sys
+sys.path.append('..')
+import command_list
 
 class TestServer:
   def __init__(self):
@@ -16,17 +19,40 @@ class TestServer:
   def recv(self):
     while self.server_state == "connected":
       try:
-        data, ip_addr = self.sock.recvfrom(1024)
+        recvdata, ip_addr = self.sock.recvfrom(1024)
+        recvdata_decoded = recvdata.decode()
         addr = (ip_addr[0], self.client_port)
         print("Message from", addr)
-        print("from connected user: " + str(data))
-        print("sending: " + str("OK"))
-        self.sock.sendto("SEND OK".encode('utf-8'), addr)
+        print("from connected user: " + recvdata_decoded)
+        if recvdata_decoded in command_list.query_attitude:
+          print("sending: " + "pitch:10;roll:20;yaw:30;")
+          self.sock.sendto("pitch:10;roll:20;yaw:30;".encode('utf-8'), addr)
+        if recvdata_decoded in command_list.query_battery:
+          print("sending: " + "battery:100;")
+          self.sock.sendto("battery:100;".encode('utf-8'), addr)
+        if recvdata_decoded in command_list.query_baro:
+          print("sending: " + "baro:0.01;")
+          self.sock.sendto("baro:0.01;".encode('utf-8'), addr)
+        if recvdata_decoded in command_list.query_tof:
+          print("sending: " + "tof:123;")
+          self.sock.sendto("tof:123;".encode('utf-8'), addr)
+        if recvdata_decoded in command_list.query_height:
+          print("sending: " + "height:634;")
+          self.sock.sendto("height:634;".encode('utf-8'), addr)
+        if recvdata_decoded in command_list.qury_acceleration:
+          print("sending: " + "agx:12;agy:22;agz:32;")
+          self.sock.sendto("agx:12;agy:22;agz:33;".encode('utf-8'), addr)
+        if recvdata_decoded in command_list.query_speed:
+          print("sending: " + "vgx:33;vgy:44;vgz:55;")
+          self.sock.sendto("vgx:33;vgy:44;vgz:55;".encode('utf-8'), addr)
+        if recvdata_decoded in command_list.query_wifi:
+          print("sending: " + "wifi:150;")
+          self.sock.sendto("wifi:150;".encode('utf-8'), addr)
       except KeyboardInterrupt:
         print("Server stopped")
         self.server_state = "quit"
         self.sock.close()
-      if data.decode() in "quit":
+      if recvdata_decoded in "quit":
         print("Client is requesting to quit")
         self.server_state = "quit"
         self.sock.close()
