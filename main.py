@@ -11,8 +11,6 @@ def main():
     print('run testmode')
   
   controller = gui.TelloController(mode)
-  controller.create_window()
-  controller.run()
 
 if __name__ == "__main__":
   main()
