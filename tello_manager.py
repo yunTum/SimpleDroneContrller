@@ -20,6 +20,7 @@ class TelloSocket:
     self.udp_bufsize = 1024
     self.state = 'disconnected'
     self.response = None
+    self.socket = None
 
   def __del__(self):
     print('TelloSocket is deleted')
@@ -58,16 +59,16 @@ class TelloSocket:
     return response
   
   def send_query(self):
-      self.socket_send(command_list.query_battery)
-      time.sleep(0.1)
+      # self.socket_send(command_list.query_battery)
+      # time.sleep(0.1)
       self.socket_send(command_list.query_attitude)
       time.sleep(0.1)
       self.socket_send(command_list.query_tof)
       time.sleep(0.1)
-      self.socket_send(command_list.query_baro)
-      time.sleep(0.1)
-      self.socket_send(command_list.query_height)
-      time.sleep(0.1)
+      # self.socket_send(command_list.query_baro)
+      # time.sleep(0.1)
+      # self.socket_send(command_list.query_height)
+      # time.sleep(0.1)
       self.socket_send(command_list.qury_acceleration)
       time.sleep(0.1)
       self.socket_send(command_list.query_speed)
@@ -91,6 +92,7 @@ class TelloSocket:
 def drone_test():
   tello_port = 8889
   tello = TelloSocket(tello_port, '')
+  tello.socket_setup()
   tello.socket_send(command_list.Command)
   time.sleep(1)
   tello.socket_send(command_list.takeoff)
