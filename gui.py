@@ -18,6 +18,7 @@ class TelloController:
     self.recv_thread = threading.Thread(target=self.recv_tello)
     self.query_thread = threading.Thread(target=self.query_tello)
     self.update_thread = threading.Thread(target=self.update_window)
+    self.recv_thread_stream = threading.Thread(target=self.recv_tello_stream)
     self.create_window()
     self.run()
 
@@ -91,6 +92,12 @@ class TelloController:
       ], pad=((20, 0), ( 0, 10))
     )
     
+    stream_img_frame = sg.Frame('',
+      [
+        [sg.Image(key='-IMAGE-')],
+      ], pad=((20, 0), ( 0, 10)), size=(320,240), relief=sg.RELIEF_FLAT
+    )
+    
     control_frame = sg.Frame('',
       [
         [connect_frame],
@@ -103,10 +110,10 @@ class TelloController:
     )
     
     layout =  [ 
-                [state_frame, control_frame],
+                [state_frame, control_frame, stream_img_frame],
               ]
 
-    self.window = sg.Window('Tello Controller', layout, resizable=True, finalize=True)
+    self.window = sg.Window('Tello Controller', layout, resizable=True, finalize=True, size=(1300, 600))
   
   def tello_connect(self):
     try:
@@ -163,6 +170,10 @@ class TelloController:
           self.event_rightroll()
         if event == '-TESTCOMMANDEXECUTE-':
           self.event_testcommand()
+        if event == '-STREAMON-':
+          self.event_streamon()
+        if event == '-STREAMOFF-':
+          self.event_streamoff()
 
     self.kill_thread()
     self.window.close()
@@ -174,6 +185,8 @@ class TelloController:
       self.recv_thread.join()
       self.query_thread.join()
       self.update_thread.join()
+    if self.tello_stream:
+      self.recv_thread_stream.join()
   
   def recv_tello(self):
     response = None
@@ -219,6 +232,15 @@ class TelloController:
       self.window['-TOF-'].update(self.tello_state.tof)
       self.window['-HEIGHT-'].update(self.tello_state.height)
       time.sleep(0.5)
+  
+  def recv_tello_stream(self):
+    while self.state != 'disconnected':
+      self.tello_stream.get_frame()
+      self.window['-IMAGE-'].update(data=self.tello_stream.frame)
+  
+  def show_video_stream(self):
+    self.tello_stream = tello_manager.TelloVideoSocket(11111, self.mode)
+    self.recv_thread_stream.start()
   
   def event_takeoff(self):
     print('TAKEOFF')
@@ -266,6 +288,20 @@ class TelloController:
     if self.state == 'connected':
       self.tello.socket_send(command)
     self.window['-TESTCOMMAND-'].update('')
+
+  def event_streamon(self):
+    print('STREAMON')
+    # img = cv2.imread('./noimage.jpg')
+    # imgbytes = cv2.imencode('.png', img)[1].tobytes()
+    # self.window['-IMAGE-'].update(data=imgbytes)
+    if self.state == 'connected':
+      self.tello.socket_send('streamon')
+      self.show_video_stream()
+  
+  def event_streamoff(self):
+    print('STREAMOFF')
+    if self.state == 'connected':
+      self.tello.socket_send('streamoff')
 
 if __name__ == "__main__":
   pass

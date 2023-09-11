@@ -144,5 +144,23 @@ class Tello:
   def get_state(self):
     return self.battery, self.attitude, self.tof, self.height, self.acceleration, self.speed
 
+class TelloVideoSocket:
+  TELLO_IP_ADDRESS = '0.0.0.0'
+  TELLO_IP_PORT = 11111
+  TELLI_VIDEO_ADDRESS = 'udp://@' + TELLO_IP_ADDRESS + ':' + str(TELLO_IP_PORT)
+  
+  def __init__(self):
+    self.cap = cv2.VideoCapture(self.TELLI_VIDEO_ADDRESS)
+    self.frame = None
+    
+  def __del__(self):
+    self.cap.release()
+    cv2.destroyAllWindows()
+  
+  def get_frame(self):
+    ret, frame = self.cap.read()
+    if ret:
+      self.frame = frame
+
 if __name__ == "__main__":
   drone_test()
