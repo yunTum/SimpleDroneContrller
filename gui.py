@@ -26,19 +26,19 @@ class TelloController:
     flight_state_frame = sg.Frame('',
       [
         [sg.Text('Fight State')],
-        [sg.Text('Battery:'), sg.Text('0%', key='-BATTERY-')],
-        [sg.Text('X-Acc:'), sg.Text('0 m/s^2', key='-XACC-')],
-        [sg.Text('Y-Acc:'), sg.Text('0 m/s^2', key='-YACC-')],
-        [sg.Text('Z-Acc:'), sg.Text('0 m/s^2', key='-ZACC-')],
-        [sg.Text('X-Speed:'), sg.Text('0 m/s', key='-XSPEED-')],
-        [sg.Text('Y-Speed:'), sg.Text('0 m/s', key='-YSPEED-')],
-        [sg.Text('Z-Speed:'), sg.Text('0 m/s', key='-ZSPEED-')],
-        [sg.Text('Roll:'), sg.Text('0 rad', key='-ROLL-')],
-        [sg.Text('Pitch:'), sg.Text('0 rad', key='-PITCH-')],
-        [sg.Text('Yaw:'), sg.Text('0 rad', key='-YAW-')],
-        [sg.Text('Barometer:'), sg.Text('0 cm', key='-BAROMETER-')],
-        [sg.Text('ToF-Distance:'), sg.Text('0 m', key='-TOF-')],
-        [sg.Text('Height:'), sg.Text('0%', key='-HEIGHT-')],
+        [sg.Text('Battery:', size=(12, 1)), sg.Text('0', key='-BATTERY-', size=(2, 1)), sg.Text('%')],
+        [sg.Text('X-Acc:', size=(12, 1)), sg.Text('0', key='-XACC-', size=(2, 1)), sg.Text('m/s^2')],
+        [sg.Text('Y-Acc:', size=(12, 1)), sg.Text('0', key='-YACC-', size=(2, 1)), sg.Text('m/s^2')],
+        [sg.Text('Z-Acc:', size=(12, 1)), sg.Text('0', key='-ZACC-', size=(2, 1)), sg.Text('m/s^2')],
+        [sg.Text('X-Speed:', size=(12, 1)), sg.Text('0', key='-XSPEED-', size=(2, 1)), sg.Text('cm/s')],
+        [sg.Text('Y-Speed:', size=(12, 1)), sg.Text('0', key='-YSPEED-', size=(2, 1)), sg.Text('cm/s')],
+        [sg.Text('Z-Speed:', size=(12, 1)), sg.Text('0', key='-ZSPEED-', size=(2, 1)), sg.Text('cm/s')],
+        [sg.Text('Roll:', size=(12, 1)), sg.Text('0', key='-ROLL-', size=(2, 1)), sg.Text('°')],
+        [sg.Text('Pitch:', size=(12, 1)), sg.Text('0', key='-PITCH-', size=(2, 1)), sg.Text('°')],
+        [sg.Text('Yaw:', size=(12, 1)), sg.Text('0', key='-YAW-', size=(2, 1)), sg.Text('°')],
+        [sg.Text('Barometer:', size=(12, 1)), sg.Text('0', key='-BAROMETER-', size=(2, 1)), sg.Text('cm')],
+        [sg.Text('ToF-Distance:', size=(12, 1)), sg.Text('0', key='-TOF-', size=(2, 1)), sg.Text('cm')],
+        [sg.Text('Height:', size=(12, 1)), sg.Text('0', key='-HEIGHT-', size=(2, 1)), sg.Text('cm')],
       ], size=(150,350)
     )
     udp_frame = sg.Frame('',
@@ -85,9 +85,16 @@ class TelloController:
       ], relief=sg.RELIEF_FLAT
     )
     
+    stream_frame = sg.Frame('', 
+      [
+        [sg.Button('SteamON', key='-STREAMON-'), sg.Button('SteamOFF', key='-STREAMOFF-', disabled=True)],
+      ], pad=((20, 0), ( 0, 10))
+    )
+    
     control_frame = sg.Frame('',
       [
         [connect_frame],
+        [stream_frame],
         [test_command_frame],
         [flight_flame],
         [move_frame],
