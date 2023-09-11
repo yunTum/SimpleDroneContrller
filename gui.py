@@ -44,28 +44,38 @@ class TelloController:
     udp_frame = sg.Frame('',
       [
         [sg.Text('Socket State')],
-        [sg.Text('Socket:'), sg.Text('disconneted', key='-SOCKET-')],
-      ], size=(200,100)
+        [sg.Text('Socket:'), sg.Text('disconneted', key='-SOCKET-', size=(10,1))],
+      ], size=(200,150)
     )
     connect_frame = sg.Frame('',
       [
         [sg.Text('Connect')],
-        [sg.Button('Connect', key='-CONNECT-'), sg.Button('Disconnect', key='-DISCONNECT-')],
-        [sg.Button('TestCommand', key='-TESTCOMMAND-')]
-      ], pad=((20, 0), ( 0, 50))
+        [sg.Button('Connect', key='-CONNECT-'), sg.Button('Disconnect', key='-DISCONNECT-', disabled=True)],
+      ], pad=((20, 0), ( 0, 10))
     )
+    test_command_frame = sg.Frame('',
+      [
+        [sg.Input('Connect', size=(25,1), key='-TESTCOMMAND-')],
+        [sg.Button('TestCommand', key='-TESTCOMMANDEXECUTE-')]
+      ], pad=((20, 0), ( 0, 10))
+    )
+    logging_frame = sg.Frame('',
+      [
+        [sg.Multiline(size=(40,10), key='-LOGGING-', disabled=True, autoscroll=True)],
+      ], pad=((20, 0), ( 0, 10))
+    )                                      
     flight_flame = sg.Frame('',
       [
         [sg.Text('Flight')],
         [sg.Button('TAKEOFF', key='-TAKEOFF-'), sg.Button('LAND', key='-LAND-')],
-      ], size=(200,100), pad=((20, 0), ( 0, 50))
+      ], size=(200,100), pad=((20, 0), ( 0, 10))
     )
     
     move_frame = sg.Frame('',
       [
         [sg.Button('L', size=(5,2), key='-LEFTROLL-'), sg.Button('↑', size=(5,2), key='-FRONT-'), sg.Button('R', size=(5,2), key='-RIGHTROLL-')],
         [sg.Button('←', size=(5,2), key='-LEFT-'), sg.Button('↓', size=(5,2), key='-BACK-'), sg.Button('→', size=(5,2), key='-RIGHT-')],
-      ], size=(200,200)
+      ], size=(200,200), pad=((20, 0), ( 0, 10))
     )
     
     state_frame = sg.Frame('',
@@ -78,8 +88,10 @@ class TelloController:
     control_frame = sg.Frame('',
       [
         [connect_frame],
+        [test_command_frame],
         [flight_flame],
         [move_frame],
+        [logging_frame],
       ], relief=sg.RELIEF_FLAT
     )
     
@@ -91,7 +103,7 @@ class TelloController:
   
   def tello_connect(self):
     try:
-      self.tello = tello_manager.TelloSocket(8889, self.mode)
+      self.tello = tello_manager.TelloStateSocket(8889, self.mode)
       self.tello.socket_setup()
       self.state = self.tello.get_state()
       self.window['-SOCKET-'].update(self.state)
@@ -142,7 +154,7 @@ class TelloController:
           self.event_leftroll()
         if event == '-RIGHTROLL-':
           self.event_rightroll()
-        if event == '-TESTCOMMAND-':
+        if event == '-TESTCOMMANDEXECUTE-':
           self.event_testcommand()
 
     self.kill_thread()
@@ -175,6 +187,8 @@ class TelloController:
       #   self.tello_state.set_height(split_response[1])
       if 'agx' in split_response:
         self.tello_state.set_acceleration(split_response[1], split_response[3], split_response[5])
+      else:
+        self.window['-LOGGING-'].print(response)
 
     print('exit from the recv thread.')
     
@@ -240,9 +254,11 @@ class TelloController:
       self.tello.socket_send('cw 50')
 
   def event_testcommand(self):
-      print('SEND TEST COMMAND')
-      if self.state == 'connected':
-        self.tello.socket_send('speed?')
+    command = self.window['-TESTCOMMAND-'].get()
+    print('SEND TESTCOMMAND: {0}'.format(command))
+    if self.state == 'connected':
+      self.tello.socket_send(command)
+    self.window['-TESTCOMMAND-'].update('')
 
 if __name__ == "__main__":
   pass

@@ -3,12 +3,13 @@
 import socket
 import time
 import command_list
+import cv2
 
 '''
 # Bind the socket to the port
 # address = 192.168.10.1 UDP PORT 8889
 '''
-class TelloSocket:
+class TelloStateSocket:
   TELLO_IP_ADDRESS = '192.168.10.1'
   TEST_IP_ADDRESS = 'localhost'
   MY_IP_ADDRESS = '192.168.10.2'
@@ -23,7 +24,7 @@ class TelloSocket:
     self.socket = None
 
   def __del__(self):
-    print('TelloSocket is deleted')
+    print('TelloStateSocket is deleted')
   
   def socket_setup(self):
     try:
@@ -91,7 +92,7 @@ class TelloSocket:
 
 def drone_test():
   tello_port = 8889
-  tello = TelloSocket(tello_port, '')
+  tello = TelloStateSocket(tello_port, '')
   tello.socket_setup()
   tello.socket_send(command_list.Command)
   time.sleep(1)
