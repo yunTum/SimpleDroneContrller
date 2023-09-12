@@ -27,20 +27,20 @@ class TelloController:
     flight_state_frame = sg.Frame('',
       [
         [sg.Text('Fight State')],
-        [sg.Text('Battery:', size=(12, 1)), sg.Text('0', key='-BATTERY-', size=(2, 1)), sg.Text('%')],
-        [sg.Text('X-Acc:', size=(12, 1)), sg.Text('0', key='-XACC-', size=(2, 1)), sg.Text('m/s^2')],
-        [sg.Text('Y-Acc:', size=(12, 1)), sg.Text('0', key='-YACC-', size=(2, 1)), sg.Text('m/s^2')],
-        [sg.Text('Z-Acc:', size=(12, 1)), sg.Text('0', key='-ZACC-', size=(2, 1)), sg.Text('m/s^2')],
-        [sg.Text('X-Speed:', size=(12, 1)), sg.Text('0', key='-XSPEED-', size=(2, 1)), sg.Text('cm/s')],
-        [sg.Text('Y-Speed:', size=(12, 1)), sg.Text('0', key='-YSPEED-', size=(2, 1)), sg.Text('cm/s')],
-        [sg.Text('Z-Speed:', size=(12, 1)), sg.Text('0', key='-ZSPEED-', size=(2, 1)), sg.Text('cm/s')],
-        [sg.Text('Roll:', size=(12, 1)), sg.Text('0', key='-ROLL-', size=(2, 1)), sg.Text('°')],
-        [sg.Text('Pitch:', size=(12, 1)), sg.Text('0', key='-PITCH-', size=(2, 1)), sg.Text('°')],
-        [sg.Text('Yaw:', size=(12, 1)), sg.Text('0', key='-YAW-', size=(2, 1)), sg.Text('°')],
-        [sg.Text('Barometer:', size=(12, 1)), sg.Text('0', key='-BAROMETER-', size=(2, 1)), sg.Text('cm')],
-        [sg.Text('ToF-Distance:', size=(12, 1)), sg.Text('0', key='-TOF-', size=(2, 1)), sg.Text('cm')],
-        [sg.Text('Height:', size=(12, 1)), sg.Text('0', key='-HEIGHT-', size=(2, 1)), sg.Text('cm')],
-      ], size=(150,350)
+        [sg.Text('Battery:', size=(11, 1)), sg.Text('0', key='-BATTERY-', size=(3, 1)), sg.Text('%')],
+        [sg.Text('X-Acc:', size=(11, 1)), sg.Text('0', key='-XACC-', size=(3, 1)), sg.Text('m/s^2')],
+        [sg.Text('Y-Acc:', size=(11, 1)), sg.Text('0', key='-YACC-', size=(3, 1)), sg.Text('m/s^2')],
+        [sg.Text('Z-Acc:', size=(11, 1)), sg.Text('0', key='-ZACC-', size=(3, 1)), sg.Text('m/s^2')],
+        [sg.Text('X-Speed:', size=(11, 1)), sg.Text('0', key='-XSPEED-', size=(3, 1)), sg.Text('cm/s')],
+        [sg.Text('Y-Speed:', size=(11, 1)), sg.Text('0', key='-YSPEED-', size=(3, 1)), sg.Text('cm/s')],
+        [sg.Text('Z-Speed:', size=(11, 1)), sg.Text('0', key='-ZSPEED-', size=(3, 1)), sg.Text('cm/s')],
+        [sg.Text('Roll:', size=(11, 1)), sg.Text('0', key='-ROLL-', size=(3, 1)), sg.Text('°')],
+        [sg.Text('Pitch:', size=(11, 1)), sg.Text('0', key='-PITCH-', size=(3, 1)), sg.Text('°')],
+        [sg.Text('Yaw:', size=(11, 1)), sg.Text('0', key='-YAW-', size=(3, 1)), sg.Text('°')],
+        [sg.Text('Barometer:', size=(11, 1)), sg.Text('0', key='-BAROMETER-', size=(3, 1)), sg.Text('cm')],
+        [sg.Text('ToF-Distance:', size=(11, 1)), sg.Text('0', key='-TOF-', size=(3, 1)), sg.Text('cm')],
+        [sg.Text('Height:', size=(11, 1)), sg.Text('0', key='-HEIGHT-', size=(3, 1)), sg.Text('cm')],
+      ], size=(200,350)
     )
     udp_frame = sg.Frame('',
       [
@@ -185,27 +185,28 @@ class TelloController:
       self.recv_thread.join()
       self.query_thread.join()
       self.update_thread.join()
-    if self.tello_stream:
-      self.recv_thread_stream.join()
+    #if self.tello_stream:
+      #self.recv_thread_stream.join()
   
   def recv_tello(self):
     response = None
     while self.state != 'disconnected':
       response = self.tello.recv_data()
       split_response = re.split('[:;]', response)
+      print(split_response)
       # if 'battery' in split_response:
       #   self.tello_state.set_battery(split_response[1])
       if 'vgx' in split_response:
         self.tello_state.set_speed(split_response[1], split_response[3], split_response[5])
-      if 'pitch' in split_response:
+      elif 'pitch' in split_response:
         self.tello_state.set_attitude(split_response[1], split_response[3], split_response[5])
       # if 'baro' in split_response:
       #   self.tello_state.set_barometer(split_response[1])
-      if 'mm' in split_response[0]:
+      elif 'mm' in split_response[0]:
         self.tello_state.set_tof(split_response[0])
       # if 'height' in split_response:
       #   self.tello_state.set_height(split_response[1])
-      if 'agx' in split_response:
+      elif 'agx' in split_response:
         self.tello_state.set_acceleration(split_response[1], split_response[3], split_response[5])
       else:
         self.window['-LOGGING-'].print(response)
@@ -239,8 +240,9 @@ class TelloController:
       self.window['-IMAGE-'].update(data=self.tello_stream.frame)
   
   def show_video_stream(self):
-    self.tello_stream = tello_manager.TelloVideoSocket(11111, self.mode)
-    self.recv_thread_stream.start()
+    self.tello_stream.get_frame()
+    #self.window['-IMAGE-'].update(data=self.tello_stream.frame)
+    #self.recv_thread_stream.start()
   
   def event_takeoff(self):
     print('TAKEOFF')
@@ -296,6 +298,7 @@ class TelloController:
     # self.window['-IMAGE-'].update(data=imgbytes)
     if self.state == 'connected':
       self.tello.socket_send('streamon')
+      self.tello_stream = tello_manager.TelloVideoSocket()
       self.show_video_stream()
   
   def event_streamoff(self):

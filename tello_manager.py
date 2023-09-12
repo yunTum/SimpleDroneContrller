@@ -72,8 +72,8 @@ class TelloStateSocket:
       # time.sleep(0.1)
       self.socket_send(command_list.qury_acceleration)
       time.sleep(0.1)
-      self.socket_send(command_list.query_speed)
-      time.sleep(0.1)
+      # self.socket_send(command_list.query_speed)
+      # time.sleep(0.1)
       
   def get_response(self):
     return self.response
